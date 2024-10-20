@@ -20,15 +20,12 @@ export default [
       "no-implicit-globals": "error",
       "no-redeclare": "error",
       "indent": ["error", 2],
-      "quotes": ["error", "single"],
       "semi": ["error", "always"],
-      "comma-dangle": ["error", "always-multiline"],
       "object-curly-spacing": ["error", "always"],
       "arrow-parens": ["error", "always"],
       "no-unused-expressions": "error",
       "no-console": "warn",
       "no-undef": "error",
-      "callback-return": "error",
       "no-path-concat": "error",
 
 
