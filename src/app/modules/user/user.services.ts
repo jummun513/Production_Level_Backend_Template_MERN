@@ -17,6 +17,12 @@ const createUserIntoDB = async (user: TUser) => {
   return sendData;
 };
 
+const getSingleUserFromDB = async (userId: string) => {
+  const result = await UserModel.findById(userId, { __v: 0, password: 0 });
+  return result;
+};
+
 export const userServices = {
   createUserIntoDB,
+  getSingleUserFromDB,
 };

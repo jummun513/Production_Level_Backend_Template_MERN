@@ -62,7 +62,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     const simplifiedError = handleCastError(err);
     response.statusCode = simplifiedError.statusCode;
     response.message = simplifiedError?.message;
-    // response.errorMessage = simplifiedError?.errorMessage;
+    response.errorMessage = simplifiedError?.errorMessage;
   } else if (err instanceof ApiError) {
     // throw new Error extend as ApiError handle
     response.statusCode = err?.statusCode;
