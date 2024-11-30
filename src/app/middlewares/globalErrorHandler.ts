@@ -21,12 +21,7 @@ type TResponse = {
   stack?: string | null;
 };
 
-const globalErrorHandler: ErrorRequestHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next): void => {
   const response: Partial<TResponse> = { success: false };
   response.message = err?.message || 'Something Went Wrong!';
   response.statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
@@ -72,11 +67,12 @@ const globalErrorHandler: ErrorRequestHandler = (
       : [];
   }
 
-  return res.status(response.statusCode!).json({
+  res.status(response.statusCode!).json({
     ...response,
     errorDetails: config.node_env === 'development' ? err : null,
     stack: config.node_env === 'development' ? err?.stack : null,
   });
+  return;
 };
 
 export default globalErrorHandler;
