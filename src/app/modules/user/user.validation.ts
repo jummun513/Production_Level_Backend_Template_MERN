@@ -5,6 +5,13 @@ const userCreateValidationSchema = z.object({
     required_error: 'User ID field is required!',
     invalid_type_error: 'User ID field allowed only string!',
   }),
+  userName: z
+    .string({
+      required_error: 'User Name field is required!',
+      invalid_type_error: 'User Name field allowed only string!',
+    })
+    .min(5, { message: 'Must be 5 or more characters long' })
+    .max(15, { message: 'Must be 5 or fewer characters long' }),
   firstName: z.string({
     required_error: 'First Name field is required!',
     invalid_type_error: 'First Name field allowed only string!',
@@ -31,7 +38,8 @@ const userCreateValidationSchema = z.object({
   }),
   gender: z.enum(['male', 'female', 'other'], {
     required_error: 'Gender field is required!',
-    invalid_type_error: 'Gender field allowed only string!',
+    invalid_type_error:
+      "Gender field must be a string and one of 'male', 'female', 'other'!",
   }),
 });
 
