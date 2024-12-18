@@ -21,7 +21,7 @@ const createProductIntoDB = async (product: TProduct) => {
 };
 
 const getSingleProductFromDB = async (productId: string) => {
-  await ProductModel.isProductExists(productId);
+  await ProductModel.isProductExist(productId);
   const result = await ProductModel.findById(productId);
 
   // selective data retrieve

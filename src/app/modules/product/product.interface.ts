@@ -35,5 +35,5 @@ export type TProduct = {
 // statics method
 export interface ProductStatics extends Model<TProduct> {
   productNameAlreadyExist(productName: string): Promise<TProduct | null>; // when not use mongoose unique
-  isProductExists(productId: string): Promise<TProduct | null>; // for edit or searching is product exit or not
+  isProductExist(productId: string): Promise<TProduct | null>; // for edit or searching is product exit or not
 }

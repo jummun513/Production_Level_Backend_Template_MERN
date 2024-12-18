@@ -23,7 +23,7 @@ const reviewSchema = new Schema({
   comment: { type: String, required: true },
   rating: { type: Number, required: true, min: 0, max: 5 },
   date: { type: String, required: true },
-  ref: 'user',
+  // ref: 'user',
 });
 
 const productSchema = new Schema<TProduct, ProductStatics>(
@@ -43,11 +43,9 @@ const productSchema = new Schema<TProduct, ProductStatics>(
     },
     price: {
       type: Number,
+      required: [true, 'Price is required'],
       min: [0, 'Minimum price should be 0.'],
-      required: [true, 'Price is required.'],
-      set: (value: number): void => {
-        parseFloat(value.toFixed(2));
-      },
+      set: (value: number): number => parseFloat(value.toFixed(2)),
     },
     priceUnit: {
       type: String,

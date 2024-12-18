@@ -11,6 +11,6 @@ router.post(
   productControllers.createProduct
 );
 
-router.get('/:userId', productControllers.getSingleProduct);
+router.get('/:productId', productControllers.getSingleProduct);
 
 export const productRoutes = router;
