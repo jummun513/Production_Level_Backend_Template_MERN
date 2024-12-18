@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
-import { userServices } from './user.services';
+import { productServices } from './product.services';
 
-const createUser = catchAsync(async (req, res) => {
-  const result = await userServices.createUserIntoDB(req.body);
+const createProduct = catchAsync(async (req, res) => {
+  const result = await productServices.createProductIntoDB(req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -13,9 +13,9 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
-const getSingleUser = catchAsync(async (req, res) => {
-  const { userId } = req.params;
-  const result = await userServices.getSingleUserFromDB(userId);
+const getSingleProduct = catchAsync(async (req, res) => {
+  const { productId } = req.params;
+  const result = await productServices.getSingleProductFromDB(productId);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -24,7 +24,7 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 
-export const userControllers = {
-  createUser,
-  getSingleUser,
+export const productControllers = {
+  createProduct,
+  getSingleProduct,
 };
