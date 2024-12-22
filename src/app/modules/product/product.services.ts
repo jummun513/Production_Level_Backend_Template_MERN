@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
+import { StatusCodes } from 'http-status-codes';
+import ApiError from '../../../errors/ApiError';
 import { TProduct } from './product.interface';
 import { ProductModel } from './product.model';
 
@@ -20,6 +22,16 @@ const createProductIntoDB = async (product: TProduct) => {
   return result.toObject();
 };
 
+const getAllProductsFromDB = async () => {
+  const dataQuery = ProductModel.find({}, { __v: 0, isDeleted: 0 })
+    .skip(0)
+    .limit(0)
+    .exec();
+  const countQuery = ProductModel.countDocuments().exec();
+  const [data, count] = await Promise.all([dataQuery, countQuery]);
+  return { data: data, meta: { page: 1, limit: 0, total: count } };
+};
+
 const getSingleProductFromDB = async (productId: string) => {
   await ProductModel.isProductExist(productId);
   const result = await ProductModel.findById(productId);
@@ -34,17 +46,39 @@ const getSingleProductFromDB = async (productId: string) => {
   return result?.toObject();
 };
 
-const updateSingleProductIntoDB = async (productId: string) => {
-  const result = await ProductModel.findByIdAndUpdate(
-    productId,
-    { isDeleted: true },
-    { new: true }
-  );
-  return result;
+const softDeleteSingleProductFromDB = async (productId: string) => {
+  await ProductModel.isProductExist(productId);
+  const result = await ProductModel.findByIdAndUpdate(productId, {
+    isDeleted: true,
+  });
+  if (result) {
+    return;
+  } else {
+    throw new ApiError(StatusCodes.BAD_GATEWAY, 'Invalid response!');
+  }
+};
+
+const updateSingleProductIntoDB = async (
+  productId: string,
+  payLoad: Partial<TProduct>
+) => {
+  await ProductModel.isProductExist(productId);
+
+  const result = await ProductModel.findByIdAndUpdate(productId, payLoad, {
+    new: true,
+  });
+
+  if (result) {
+    return result;
+  } else {
+    throw new ApiError(StatusCodes.BAD_GATEWAY, 'Invalid response!');
+  }
 };
 
 export const productServices = {
   createProductIntoDB,
+  getAllProductsFromDB,
   getSingleProductFromDB,
+  softDeleteSingleProductFromDB,
   updateSingleProductIntoDB,
 };

@@ -93,7 +93,7 @@ productSchema.set('toObject', {
 });
 
 // soft delete data not send with user request find and findOne query
-productSchema.pre(['find', 'findOne'], function (next) {
+productSchema.pre(['find', 'findOne', 'countDocuments'], function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });

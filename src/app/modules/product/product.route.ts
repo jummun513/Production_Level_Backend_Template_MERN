@@ -11,6 +11,20 @@ router.post(
   productControllers.createProduct
 );
 
+router.get('/', productControllers.getAllProducts);
+
 router.get('/:productId', productControllers.getSingleProduct);
+
+router.patch(
+  '/delete/:productId',
+  validateRequest(productValidations.productUpdateValidationSchema),
+  productControllers.softDeleteSingleProduct
+);
+
+router.patch(
+  '/:productId',
+  validateRequest(productValidations.productUpdateValidationSchema),
+  productControllers.updateSingleProduct
+);
 
 export const productRoutes = router;
