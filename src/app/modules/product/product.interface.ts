@@ -5,6 +5,7 @@ export type TColors = (typeof COLORS)[number];
 export type TPriceUnits = (typeof PriceUnit)[number];
 
 export type TProduct = {
+  serialNo?: string;
   productCode: string;
   productName: string;
   desc: string;

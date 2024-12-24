@@ -4,10 +4,17 @@ import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
 import { TProduct } from './product.interface';
 import { ProductModel } from './product.model';
+import { generateProductId } from './product.utils';
 
 const createProductIntoDB = async (product: TProduct) => {
   await ProductModel.productNameAlreadyExist(product?.productName);
-  const result = await ProductModel.create(product);
+
+  const generatedId = await generateProductId(product);
+
+  const result = await ProductModel.create({
+    serialNo: generatedId,
+    ...product,
+  });
 
   // send selective data to frontend
   // const sendData = result.toObject({

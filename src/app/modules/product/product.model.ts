@@ -28,6 +28,11 @@ const reviewSchema = new Schema({
 
 const productSchema = new Schema<TProduct, ProductStatics>(
   {
+    serialNo: {
+      type: String,
+      unique: true,
+      required: [true, 'Product auto generated id required.'],
+    },
     productCode: {
       type: String,
       required: [true, 'Product Code is required.'],
