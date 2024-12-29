@@ -1,11 +1,8 @@
-import { TProduct } from './product.interface';
-import { ProductModel } from './product.model';
+import { TProduct } from './product.interfaces';
+import { Product } from './product.models';
 
 const findLastCreateProductId = async () => {
-  const lastCreateProduct = await ProductModel.findOne(
-    {},
-    { serialNo: 1, _id: 0 }
-  )
+  const lastCreateProduct = await Product.findOne({}, { serialNo: 1, _id: 0 })
     .sort({ createdAt: -1 })
     .lean();
 

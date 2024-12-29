@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { COLORS, PriceUnit } from './product.constant';
+import { COLORS, PriceUnit } from './product.constants';
 
 const stockCreateValidationSchema = z.object({
   color: z.enum(COLORS, { required_error: 'Color is required.' }),

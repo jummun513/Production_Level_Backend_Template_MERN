@@ -1,7 +1,7 @@
 import express from 'express';
-import { productControllers } from './product.controller';
-import validateRequest from '../../middlewares/validateRequest';
-import { productValidations } from './product.validation';
+import { productControllers } from './product.controllers';
+import { productValidations } from './product.validations';
+import validateRequest from '../../../middlewares/validateRequest';
 
 const router = express.Router();
 
@@ -10,8 +10,6 @@ router.post(
   validateRequest(productValidations.productCreateValidationSchema),
   productControllers.createProduct
 );
-
-router.get('/', productControllers.getAllProducts);
 
 router.get('/:productId', productControllers.getSingleProduct);
 

@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { StatusCodes } from 'http-status-codes';
-import ApiError from '../../../errors/ApiError';
-import { TProduct } from './product.interface';
-import { ProductModel } from './product.model';
+import { TProduct } from './product.interfaces';
+import { Product } from './product.models';
 import { generateProductId } from './product.utils';
+import ApiError from '../../../../errors/ApiError';
 
 const createProductIntoDB = async (product: TProduct) => {
-  await ProductModel.productNameAlreadyExist(product?.productName);
+  await Product.productNameAlreadyExist(product?.productName);
 
   const generatedId = await generateProductId(product);
 
-  const result = await ProductModel.create({
+  const result = await Product.create({
     serialNo: generatedId,
     ...product,
   });
@@ -29,19 +29,9 @@ const createProductIntoDB = async (product: TProduct) => {
   return result.toObject();
 };
 
-const getAllProductsFromDB = async () => {
-  const dataQuery = ProductModel.find({}, { __v: 0, isDeleted: 0 })
-    .skip(0)
-    .limit(0)
-    .exec();
-  const countQuery = ProductModel.countDocuments().exec();
-  const [data, count] = await Promise.all([dataQuery, countQuery]);
-  return { data: data, meta: { page: 1, limit: 0, total: count } };
-};
-
 const getSingleProductFromDB = async (productId: string) => {
-  await ProductModel.isProductExist(productId);
-  const result = await ProductModel.findById(productId);
+  await Product.isProductExist(productId);
+  const result = await Product.findById(productId);
 
   // selective data retrieve
   // const result = await UserModel.findById(userId, {
@@ -54,8 +44,8 @@ const getSingleProductFromDB = async (productId: string) => {
 };
 
 const softDeleteSingleProductFromDB = async (productId: string) => {
-  await ProductModel.isProductExist(productId);
-  const result = await ProductModel.findByIdAndUpdate(productId, {
+  await Product.isProductExist(productId);
+  const result = await Product.findByIdAndUpdate(productId, {
     isDeleted: true,
   });
   if (result) {
@@ -69,9 +59,9 @@ const updateSingleProductIntoDB = async (
   productId: string,
   payLoad: Partial<TProduct>
 ) => {
-  await ProductModel.isProductExist(productId);
+  await Product.isProductExist(productId);
 
-  const result = await ProductModel.findByIdAndUpdate(productId, payLoad, {
+  const result = await Product.findByIdAndUpdate(productId, payLoad, {
     new: true,
   });
 
@@ -84,7 +74,6 @@ const updateSingleProductIntoDB = async (
 
 export const productServices = {
   createProductIntoDB,
-  getAllProductsFromDB,
   getSingleProductFromDB,
   softDeleteSingleProductFromDB,
   updateSingleProductIntoDB,

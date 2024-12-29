@@ -1,10 +1,10 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { model, Schema } from 'mongoose';
-import { TProduct, ProductStatics } from './product.interface';
-import ApiError from '../../../errors/ApiError';
+import { TProduct, ProductStatics } from './product.interfaces';
 import { StatusCodes } from 'http-status-codes';
-import { COLORS, PriceUnit } from './product.constant';
+import { COLORS, PriceUnit } from './product.constants';
+import ApiError from '../../../../errors/ApiError';
 
 const stockSchema = new Schema({
   color: { type: String, required: [true, 'Color is required.'], enum: COLORS },
@@ -73,7 +73,7 @@ const productSchema = new Schema<TProduct, ProductStatics>(
     images: { type: [Object] },
     stock: [stockSchema],
     category: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: [true, 'Category is required'],
       ref: 'category',
     },
@@ -114,7 +114,7 @@ productSchema.statics.productNameAlreadyExist =
   async function productNameAlreadyExistFunc(
     productName: string
   ): Promise<any> {
-    const existProductName = await ProductModel.findOne({ productName });
+    const existProductName = await Product.findOne({ productName });
     if (existProductName) {
       throw new ApiError(StatusCodes.CONFLICT, 'Product name already exist!');
     }
@@ -124,14 +124,14 @@ productSchema.statics.productNameAlreadyExist =
 productSchema.statics.isProductExist = async function isProductExistFunc(
   productId: string
 ): Promise<any> {
-  const existingProduct = await ProductModel.findById(productId);
+  const existingProduct = await Product.findById(productId);
   if (!existingProduct) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Product not found!');
   }
   return existingProduct;
 };
 
-export const ProductModel = model<TProduct, ProductStatics>(
+export const Product = model<TProduct, ProductStatics>(
   'product',
   productSchema
 );

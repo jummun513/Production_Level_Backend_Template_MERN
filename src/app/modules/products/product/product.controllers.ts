@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
-import catchAsync from '../../../utils/catchAsync';
-import sendResponse from '../../../utils/sendResponse';
 import { productServices } from './product.services';
+import catchAsync from '../../../../utils/catchAsync';
+import sendResponse from '../../../../utils/sendResponse';
 
 const createProduct = catchAsync(async (req, res) => {
   const result = await productServices.createProductIntoDB(req.body);
@@ -21,17 +21,6 @@ const getSingleProduct = catchAsync(async (req, res) => {
     success: true,
     message: 'Data retrieved successfully!',
     data: result,
-  });
-});
-
-const getAllProducts = catchAsync(async (req, res) => {
-  const result = await productServices.getAllProductsFromDB();
-  sendResponse(res, {
-    statusCode: StatusCodes.OK,
-    success: true,
-    message: 'Data retrieved successfully!',
-    meta: result?.meta,
-    data: result?.data,
   });
 });
 
@@ -62,7 +51,6 @@ const updateSingleProduct = catchAsync(async (req, res) => {
 
 export const productControllers = {
   createProduct,
-  getAllProducts,
   getSingleProduct,
   softDeleteSingleProduct,
   updateSingleProduct,

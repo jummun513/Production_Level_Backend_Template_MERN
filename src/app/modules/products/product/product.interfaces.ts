@@ -1,5 +1,5 @@
-import { Model } from 'mongoose';
-import { COLORS, PriceUnit } from './product.constant';
+import { Model, Types } from 'mongoose';
+import { COLORS, PriceUnit } from './product.constants';
 
 export type TColors = (typeof COLORS)[number];
 export type TPriceUnits = (typeof PriceUnit)[number];
@@ -19,7 +19,7 @@ export type TProduct = {
       [size: string]: number;
     };
   };
-  category: string;
+  category: Types.ObjectId;
   tags?: string[];
   isFeatured?: boolean;
   rating?: number;
