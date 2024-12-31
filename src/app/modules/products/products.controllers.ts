@@ -4,7 +4,7 @@ import sendResponse from '../../../utils/sendResponse';
 import { productsServices } from './products.services';
 
 const getAllProducts = catchAsync(async (req, res) => {
-  const result = await productsServices.getAllProductsFromDB();
+  const result = await productsServices.getAllProductsFromDB(req?.query);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
