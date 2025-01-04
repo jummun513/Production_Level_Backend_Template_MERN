@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { COLORS, PriceUnit } from './product.constants';
 
+// create validation
 const stockCreateValidationSchema = z.object({
   color: z.enum(COLORS, { required_error: 'Color is required.' }),
   sizes: z.object({
@@ -65,14 +66,45 @@ const productCreateValidationSchema = z.object({
     required_error: 'Category field is required!',
     invalid_type_error: 'Category field allowed only string!',
   }),
+  reviews: z.array(reviewCreateValidationSchema).optional(),
+});
+
+// update validation
+
+const stockUpdateValidationSchema = z.object({
+  color: z.enum(COLORS, { required_error: 'Color is required.' }),
+  sizes: z
+    .object({
+      S: z.number().min(0).default(0).optional(),
+      M: z.number().min(0).default(0).optional(),
+      L: z.number().min(0).default(0).optional(),
+      XL: z.number().min(0).default(0).optional(),
+      '2XL': z.number().min(0).default(0).optional(),
+      '3XL': z.number().min(0).default(0).optional(),
+    })
+    .optional(),
+});
+
+const reviewUpdateValidationSchema = z.object({
+  userId: z.string({
+    required_error: 'User Id field is required!',
+    invalid_type_error: 'User Id field allowed only string!',
+  }),
+  comment: z
+    .string({
+      required_error: 'Comments field is required!',
+      invalid_type_error: 'Comments field allowed only string!',
+    })
+    .optional(),
+  rating: z
+    .number()
+    .min(0)
+    .max(5)
+    .nonnegative({ message: 'Rating is required.' })
+    .optional(),
 });
 
 const productUpdateValidationSchema = z.object({
-  productCode: z
-    .string({
-      invalid_type_error: 'Product code field allowed only string!',
-    })
-    .optional(),
   productName: z
     .string({
       invalid_type_error: 'Product name field allowed only string!',
@@ -100,14 +132,14 @@ const productUpdateValidationSchema = z.object({
     .int({ message: 'Quantity must be an integer.' })
     .min(0, { message: 'Quantity must be a positive integer.' })
     .optional(),
-  stock: z.array(stockCreateValidationSchema).optional(),
+  stock: z.array(stockUpdateValidationSchema).optional(),
   category: z
     .string({
       required_error: 'Category field is required!',
       invalid_type_error: 'Category field allowed only string!',
     })
     .optional(),
-  reviews: z.array(reviewCreateValidationSchema).optional(),
+  reviews: z.array(reviewUpdateValidationSchema).optional(),
   tags: z.array(z.string()).optional(),
   isFeatured: z.boolean().default(false).optional(),
   rating: z.number().min(0).max(5).optional(),
