@@ -59,10 +59,16 @@ const updateSingleProductIntoDB = async (
   productId: string,
   payLoad: Partial<TProduct>
 ) => {
-  await Product.isProductExist(productId);
+  const product = await Product.isProductExist(productId);
+  const { images, ...rest } = payLoad;
+  const newPayLoad: Record<string, unknown> = { ...rest };
+  if (images) {
+    newPayLoad.images = [...(product?.images ?? []), ...images];
+  }
 
-  const result = await Product.findByIdAndUpdate(productId, payLoad, {
+  const result = await Product.findByIdAndUpdate(productId, newPayLoad, {
     new: true,
+    runValidators: true,
   });
 
   if (result) {
