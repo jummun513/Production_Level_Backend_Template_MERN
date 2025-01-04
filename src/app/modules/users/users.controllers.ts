@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
-import { productsServices } from './products.services';
+import { usersServices } from './users.services';
 
-const getAllProducts = catchAsync(async (req, res) => {
-  const result = await productsServices.getAllProductsFromDB(req?.query);
+const getAllUsers = catchAsync(async (req, res) => {
+  const result = await usersServices.getAllUsersFromDB();
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -13,6 +13,6 @@ const getAllProducts = catchAsync(async (req, res) => {
     data: result?.data,
   });
 });
-export const productsControllers = {
-  getAllProducts,
+export const usersControllers = {
+  getAllUsers,
 };

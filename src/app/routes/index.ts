@@ -1,27 +1,17 @@
 import { Router } from 'express';
-import { productRoutes } from '../modules/products/product/product.routes';
-import { productsRoutes } from '../modules/products/products.routes';
-import { categoryRoutes } from '../modules/categories/category/category.routes';
-import { categoriesRoutes } from '../modules/categories/categories.routes';
+import { userRoutes } from '../modules/users/user/user.routes';
+import { usersRoutes } from '../modules/users/users.routes';
 
 const router = Router();
 
 const modulesRoutes = [
   {
-    path: '/products',
-    route: productsRoutes,
+    path: '/users',
+    route: usersRoutes,
   },
   {
-    path: '/product',
-    route: productRoutes,
-  },
-  {
-    path: '/categories',
-    route: categoriesRoutes,
-  },
-  {
-    path: '/category',
-    route: categoryRoutes,
+    path: '/user',
+    route: userRoutes,
   },
 ];
 
