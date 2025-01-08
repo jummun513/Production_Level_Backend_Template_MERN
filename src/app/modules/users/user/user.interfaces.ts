@@ -1,7 +1,8 @@
 import { Model } from 'mongoose';
-import { GENDERS } from './user.constants';
+import { GENDERS, USER_ROLES } from './user.constants';
 
 export type TGenders = (typeof GENDERS)[number];
+export type TUserRole = keyof typeof USER_ROLES;
 
 export type TUser = {
   userId?: string;
@@ -11,9 +12,9 @@ export type TUser = {
     middleName?: string;
     lastName?: string;
   };
+  role?: 'superAdmin' | 'admin' | 'user';
   email: string;
   phone: string;
-  password: string;
   gender: 'Male' | 'Female' | 'Other';
   thumbnail?: object;
   isDeleted?: boolean;

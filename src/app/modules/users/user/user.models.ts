@@ -4,7 +4,7 @@ import { model, Schema } from 'mongoose';
 import { TUser, UserStatics } from './user.interfaces';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../../errors/ApiError';
-import { GENDERS } from './user.constants';
+import { GENDERS, USER_ROLES } from './user.constants';
 
 const nameSchema = new Schema({
   firstName: { type: String, required: [true, 'First Name is required.'] },
@@ -35,9 +35,10 @@ const userSchema = new Schema<TUser, UserStatics>(
       required: [true, 'Phone number is required.'],
       unique: true,
     },
-    password: {
+    role: {
       type: String,
-      required: [true, 'Password is required.'],
+      required: [true, 'User Role is required.'],
+      enum: USER_ROLES,
     },
     gender: {
       type: String,
@@ -59,7 +60,6 @@ const userSchema = new Schema<TUser, UserStatics>(
 userSchema.set('toObject', {
   transform: (doc, ret) => {
     delete ret.__v;
-    delete ret?.password;
     delete ret.isDeleted;
     return ret;
   },

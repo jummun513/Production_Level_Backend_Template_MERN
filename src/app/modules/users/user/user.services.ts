@@ -5,6 +5,8 @@ import ApiError from '../../../../errors/ApiError';
 import { TUser } from './user.interfaces';
 import { User } from './user.models';
 import { generateUserId } from './user.utils';
+import { createToken } from '../../auth/auth.utils';
+import config from '../../../../config';
 
 const createUserIntoDB = async (user: TUser) => {
   await User.userNameAlreadyExist(user?.userName);
@@ -12,9 +14,29 @@ const createUserIntoDB = async (user: TUser) => {
   const generatedId = await generateUserId();
 
   const result = await User.create({
-    userId: generatedId,
+    userId: generatedId, // interface userId should be optional otherwise typeError show here
+    role: 'user', // interface role should be optional otherwise typeError show here
     ...user,
   });
+
+  const jwtPayload = {
+    userId: result.userId as string,
+    userName: result.userName,
+    email: result.email,
+    role: result.role as string,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string
+  );
+
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_access_secret as string,
+    config.jwt_refresh_access_secret_expires_in as string
+  );
 
   // send selective data to frontend
   // const sendData = result.toObject({
@@ -26,15 +48,16 @@ const createUserIntoDB = async (user: TUser) => {
   //   },
   // });
 
-  return result.toObject();
+  return { accessToken, refreshToken, user: result.toObject() };
 };
 
+// used _id to get single user
 const getSingleUserFromDB = async (userId: string) => {
   await User.isUserExist(userId);
   const result = await User.findById(userId);
 
   // selective data retrieve
-  // const result = await UserModel.findById(userId, {
+  // const result = await User.findById(userId, {
   //   __v: 0,
   //   password: 0,
   //   isDeleted: 0,
@@ -76,7 +99,7 @@ const updateSingleUserIntoDB = async (
   });
 
   if (result) {
-    return result;
+    return result.toObject();
   } else {
     throw new ApiError(StatusCodes.BAD_GATEWAY, 'Invalid response!');
   }
