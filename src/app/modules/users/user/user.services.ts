@@ -7,6 +7,7 @@ import { User } from './user.models';
 import { generateUserId } from './user.utils';
 import { createToken } from '../../auth/auth.utils';
 import config from '../../../../config';
+import { USER_ROLES } from './user.constants';
 
 const createUserIntoDB = async (user: TUser) => {
   await User.userNameAlreadyExist(user?.userName);
@@ -67,7 +68,15 @@ const getSingleUserFromDB = async (userId: string) => {
 };
 
 const softDeleteSingleUserFromDB = async (userId: string) => {
-  await User.isUserExist(userId);
+  const user = await User.isUserExist(userId);
+
+  if (user?.role === USER_ROLES.superAdmin) {
+    throw new ApiError(
+      StatusCodes.BAD_GATEWAY,
+      'Super-admin can not be deleted!'
+    );
+  }
+
   const result = await User.findByIdAndUpdate(userId, {
     isDeleted: true,
   });
