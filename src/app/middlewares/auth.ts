@@ -22,7 +22,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       config.jwt_access_secret as string
     ) as JwtPayload;
 
-    const { role, email } = decoded;
+    const { role, email, iat } = decoded;
 
     // checking if the user is exist, to prevent one user data access another user
     const user = await User.findOne({ email }, { __v: 0, isDeleted: 0 });
@@ -31,7 +31,21 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'This user is not found!');
     }
 
-    if (requiredRoles && !requiredRoles.includes(role)) {
+    // if password change jwt token invalid
+    if (
+      user?.passwordChangedAt &&
+      User.isJWTIssuedBeforePasswordChanged(
+        user?.passwordChangedAt,
+        iat as number
+      )
+    ) {
+      throw new ApiError(
+        StatusCodes.UNAUTHORIZED,
+        'Forbidden access detected!'
+      );
+    }
+
+    if (requiredRoles.length && !requiredRoles.includes(role)) {
       throw new ApiError(
         StatusCodes.UNAUTHORIZED,
         'Un-authorized access detected!'

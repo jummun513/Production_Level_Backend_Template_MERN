@@ -5,6 +5,8 @@ import { TUser, UserStatics } from './user.interfaces';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../../errors/ApiError';
 import { GENDERS, USER_ROLES } from './user.constants';
+import bcrypt from 'bcrypt';
+import config from '../../../../config';
 
 const nameSchema = new Schema({
   firstName: { type: String, required: [true, 'First Name is required.'] },
@@ -25,10 +27,23 @@ const userSchema = new Schema<TUser, UserStatics>(
       unique: true,
     },
     name: nameSchema,
+    password: {
+      type: String,
+      required: [true, 'Password is required.'],
+      select: false,
+    },
+    passwordChangedAt: {
+      type: Date,
+      select: false,
+    },
     email: {
       type: String,
       required: [true, 'Email is required.'],
       unique: true,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
     phone: {
       type: String,
@@ -46,9 +61,18 @@ const userSchema = new Schema<TUser, UserStatics>(
       enum: GENDERS,
     },
     thumbnail: { type: Object },
+    verifyCode: {
+      type: String,
+      select: false,
+    },
+    verifyCodeExpiredAt: {
+      type: Date,
+      select: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
+      select: false,
     },
   },
   {
@@ -59,11 +83,45 @@ const userSchema = new Schema<TUser, UserStatics>(
 // convert mongoose document to plain object for remove sensitive/unwanted field
 userSchema.set('toObject', {
   transform: (doc, ret) => {
-    delete ret.__v;
-    delete ret.isDeleted;
+    delete ret?.__v;
+    delete ret?.password;
+    delete ret?.isDeleted;
+    delete ret?.verifyCode;
+    delete ret?.verifyCodeExpiredAt;
+    delete ret?.passwordChangedAt;
+
     return ret;
   },
 });
+
+// when add or registration user and update-password hashing password
+userSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_round)
+  );
+  next();
+});
+
+// when login password matching
+userSchema.statics.isPasswordMatched = async function (
+  plainTextPassword,
+  hashedPassword
+) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+// if password change jwt token invalid
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
+  passwordChangedTimestamp: Date,
+  jwtIssuedTimestamp: number
+) {
+  const passwordChangedTime =
+    new Date(passwordChangedTimestamp).getTime() / 1000;
+  return passwordChangedTime > jwtIssuedTimestamp;
+};
 
 // soft delete data not send with user request find and findOne query
 userSchema.pre(

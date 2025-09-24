@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Date, Model } from 'mongoose';
 import { GENDERS, USER_ROLES } from './user.constants';
 
 export type TGenders = (typeof GENDERS)[number];
@@ -12,11 +12,16 @@ export type TUser = {
     middleName?: string;
     lastName?: string;
   };
+  password: string;
+  passwordChangedAt?: Date;
   role?: 'superAdmin' | 'admin' | 'user';
   email: string;
   phone: string;
   gender: 'Male' | 'Female' | 'Other';
   thumbnail?: object;
+  verifyCode?: string;
+  verifyCodeExpiredAt?: Date;
+  isEmailVerified?: boolean;
   isDeleted?: boolean;
 };
 
@@ -24,4 +29,12 @@ export type TUser = {
 export interface UserStatics extends Model<TUser> {
   userNameAlreadyExist(userName: string): Promise<TUser | null>; // when not use mongoose unique
   isUserExist(userId: string): Promise<TUser | null>; // for edit or searching is user exit or not
+  isPasswordMatched(
+    plainTextPassword: string,
+    hashedPassword: string
+  ): Promise<boolean>; // when login check password matching or not bcrypt
+  isJWTIssuedBeforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number
+  ): boolean;
 }
