@@ -7,39 +7,17 @@ import { User } from './user.models';
 import { generateUserId } from './user.utils';
 import { createToken } from '../../auth/auth.utils';
 import config from '../../../../config';
-import { USER_ROLES } from './user.constants';
-import { otpGenerator } from '../../../../utils/otpGenerator';
-import { sendEmail } from '../../../../utils/sendEmail';
-import { verificationEmailTemplate } from '../../../../utils/emailTemplates';
 
 const createUserIntoDB = async (user: TUser) => {
   await User.userNameAlreadyExist(user?.userName);
 
   const generatedId = await generateUserId();
-  const verifyCode = otpGenerator();
-  const fullName = [
-    user?.name?.firstName,
-    user?.name?.middleName,
-    user?.name?.lastName,
-  ]
-    .filter(Boolean)
-    .join(' ');
 
   const result = await User.create({
     userId: generatedId, // interface userId should be optional otherwise typeError show here
     role: 'user', // interface role should be optional otherwise typeError show here
-    verifyCode,
-    verifyCodeExpiredAt: new Date(Date.now() + 30 * 24 * 3600 * 1000), // for 30 days
     ...user,
   });
-
-  await sendEmail(
-    user?.email,
-    'Your email confirmation OTP',
-    verificationEmailTemplate
-      .replace('{user}', fullName || 'User')
-      .replace('{verificationCode}', verifyCode)
-  );
 
   const jwtPayload = {
     userId: result.userId as string,
@@ -54,12 +32,6 @@ const createUserIntoDB = async (user: TUser) => {
     config.jwt_access_expires_in as string
   );
 
-  const refreshToken = createToken(
-    jwtPayload,
-    config.jwt_refresh_access_secret as string,
-    config.jwt_refresh_access_secret_expires_in as string
-  );
-
   // send selective data to frontend
   // const sendData = result.toObject({
   //   virtuals: false,
@@ -70,7 +42,7 @@ const createUserIntoDB = async (user: TUser) => {
   //   },
   // });
 
-  return { accessToken, refreshToken, user: result.toObject() };
+  return { accessToken, user: result.toObject() };
 };
 
 // used _id to get single user
@@ -89,15 +61,6 @@ const getSingleUserFromDB = async (userId: string) => {
 };
 
 const softDeleteSingleUserFromDB = async (userId: string) => {
-  const user = await User.isUserExist(userId);
-
-  if (user?.role === USER_ROLES.superAdmin) {
-    throw new ApiError(
-      StatusCodes.BAD_GATEWAY,
-      'Super-admin can not be deleted!'
-    );
-  }
-
   const result = await User.findByIdAndUpdate(userId, {
     isDeleted: true,
   });

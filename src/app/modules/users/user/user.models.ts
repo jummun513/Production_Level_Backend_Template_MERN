@@ -4,7 +4,7 @@ import { model, Schema } from 'mongoose';
 import { TUser, UserStatics } from './user.interfaces';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../../errors/ApiError';
-import { GENDERS, USER_ROLES } from './user.constants';
+import { GENDERS } from './user.constants';
 import bcrypt from 'bcrypt';
 import config from '../../../../config';
 
@@ -41,10 +41,6 @@ const userSchema = new Schema<TUser, UserStatics>(
       required: [true, 'Email is required.'],
       unique: true,
     },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
     phone: {
       type: String,
       required: [true, 'Phone number is required.'],
@@ -53,7 +49,7 @@ const userSchema = new Schema<TUser, UserStatics>(
     role: {
       type: String,
       required: [true, 'User Role is required.'],
-      enum: USER_ROLES,
+      enum: ['user', 'admin'],
     },
     gender: {
       type: String,
@@ -61,14 +57,6 @@ const userSchema = new Schema<TUser, UserStatics>(
       enum: GENDERS,
     },
     thumbnail: { type: Object },
-    verifyCode: {
-      type: String,
-      select: false,
-    },
-    verifyCodeExpiredAt: {
-      type: Date,
-      select: false,
-    },
     isDeleted: {
       type: Boolean,
       default: false,
